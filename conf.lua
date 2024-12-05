@@ -1,7 +1,7 @@
 _G.love = require("love")
 
 function love.conf(t)
-    t.window.title = "Elazrea Taven"
+    t.window.title = "Witch Taven"
     t.window.height = 640
     t.window.width = 1200
     t.window.icon = "blue_icon.png"
