@@ -1,0 +1,210 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map.tmx",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "#BGA_layer1": {
+            "scaleInDock": 1
+        },
+        "#BGA_layer2": {
+            "scaleInDock": 1
+        },
+        "#BGA_layer3": {
+            "scaleInDock": 1
+        },
+        "#BGA_layer4": {
+            "scaleInDock": 1
+        },
+        "#BGA_layer5": {
+            "scaleInDock": 1
+        },
+        "#BGS_layer1": {
+            "scaleInDock": 1
+        },
+        "#BGS_layer2": {
+            "scaleInDock": 1
+        },
+        "#BGS_layer3": {
+            "scaleInDock": 1
+        },
+        "#BGS_layer4": {
+            "scaleInDock": 1
+        },
+        "#BGS_layer5": {
+            "scaleInDock": 1
+        },
+        "#GandalfHardcore Platformer Assets v2": {
+            "scaleInDock": 1
+        },
+        "C:/Users/ezjaz/OneDrive/Desktop/Fantasy Swamp Forest/Free/BG_1.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/ezjaz/OneDrive/Desktop/Fantasy Swamp Forest/Free/BG_2.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/ezjaz/OneDrive/Desktop/Fantasy Swamp Forest/Free/BG_3.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Users/ezjaz/OneDrive/Desktop/Fantasy Swamp Forest/Free/Free.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -270.5,
+                "y": 2
+            }
+        },
+        "C:/Users/ezjaz/OneDrive/Desktop/Fantasy Swamp Forest/Free/Terrain_and_Props.tsx": {
+            "scaleInDock": 1
+        },
+        "map.tmx": {
+            "expandedGroupLayers": [
+                9,
+                16
+            ],
+            "expandedObjectLayers": [
+                26,
+                21,
+                24,
+                28,
+                18,
+                30
+            ],
+            "scale": 0.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 574,
+                "y": -157
+            }
+        },
+        "map.tmx#BG_layer1": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "map.tmx#BG_layer2": {
+            "scaleInDock": 1
+        },
+        "map.tmx#BG_layer3": {
+            "scaleInDock": 1
+        },
+        "map.tmx#BG_layer4": {
+            "scaleInDock": 1
+        },
+        "map.tmx#BG_layer5": {
+            "scaleInDock": 1
+        },
+        "map.tmx#map-tile": {
+            "scaleInDock": 1.5
+        },
+        "map2.tmx": {
+            "expandedGroupLayers": [
+                8,
+                19,
+                2
+            ],
+            "expandedObjectLayers": [
+                15,
+                14,
+                16,
+                18,
+                17,
+                13
+            ],
+            "scale": 0.33,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 1675.7575757575755,
+                "y": -209.090909090909
+            }
+        },
+        "map2.tmx#BGA_layer1": {
+            "scaleInDock": 1
+        },
+        "map2.tmx#BGA_layer2": {
+            "scaleInDock": 1
+        },
+        "map2.tmx#BGA_layer3": {
+            "scaleInDock": 1
+        },
+        "map2.tmx#BGA_layer4": {
+            "scaleInDock": 1
+        },
+        "map2.tmx#BGA_layer5": {
+            "scaleInDock": 1
+        },
+        "map2.tmx#GandalfHardcore Platformer Assets v2": {
+            "scaleInDock": 2
+        },
+        "map3.tmx": {
+            "expandedGroupLayers": [
+                8,
+                2
+            ],
+            "expandedObjectLayers": [
+                12,
+                15,
+                14,
+                16,
+                18,
+                17
+            ],
+            "scale": 0.33,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1490.9090909090908,
+                "y": 436.3636363636364
+            }
+        },
+        "map3.tmx#BGS_layer1": {
+            "scaleInDock": 1
+        },
+        "map3.tmx#BGS_layer2": {
+            "scaleInDock": 1
+        },
+        "map3.tmx#BGS_layer3": {
+            "scaleInDock": 1
+        },
+        "map3.tmx#BGS_layer4": {
+            "scaleInDock": 1
+        },
+        "map3.tmx#BGS_layer5": {
+            "scaleInDock": 1
+        },
+        "map3.tmx#GandalfHardcore Platformer Assets v2": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/ezjaz/OneDrive/Documents/Final_Project/Maps",
+    "last.externalTilesetPath": "C:/Users/ezjaz/OneDrive/Documents/Final_Project/Maps",
+    "last.imagePath": "C:/Users/ezjaz/OneDrive/Documents/Final_Project/Maps",
+    "map.lastUsedExportFilter": "Lua files (*.lua)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 70,
+    "openFiles": [
+        "map.tmx",
+        "map2.tmx",
+        "map3.tmx"
+    ],
+    "project": "WitchTrials.tmx.tiled-project",
+    "property.type": "object",
+    "recentFiles": [
+        "map3.tmx",
+        "map2.tmx",
+        "map.tmx",
+        "C:/Users/ezjaz/OneDrive/Desktop/Fantasy Swamp Forest/Free/Free.tmx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.lastUsedFilter": "All Files (*)",
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    }
+}
