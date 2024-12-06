@@ -442,6 +442,7 @@ function resetGame()
     player.direction = 1
     player.dead = false
     player.isGrounded = true
+    player.anim = player.animations.idle
     player.collider:setPosition(player.x, player.y)
     player.collider:setType('dynamic')  -- Make sure player can move again
     player.collider:setLinearVelocity(0, 0)
@@ -458,19 +459,21 @@ function resetGame()
         slimeData.direction = GhostDirection()  -- Reset ghost direction
     end
 
-    -- Reset camera state
-    setupCamera()
+    -- Reset portal animation
+    portal.anim = portal.portal_animations.portal
 
-    -- Reset map and colliders
+    -- Reset map and colliders and camera
     currentMapIndex = 1
     clearCurrentColliders()
     setupMap()
-
+    setupCamera()
+    
     -- Play restart sound
     sounds.restart:play()
 
     -- Reset game state to normal
     gameState = "game"
+    gameComplete = false
 end
 
 function handlePlayerAnim(dt)
@@ -660,16 +663,17 @@ function love.draw()
 
     
     -- Draw portal animations
-    if portal.anim and portal.anim.portal_sheet then
-        local sX, sY = 0.5, 0.5
-        portal.anim.animation:draw(
-            portal.anim.portal_sheet,
-            portal.x, portal.y, 0, 
-            sX, sY,
-            portal.portal_FrameWidth / 2, portal.portal_FrameHeight / 2
-        )
+    if currentMapIndex == 3 then
+        if portal.anim and portal.anim.portal_sheet then
+            local sX, sY = 0.5, 0.5
+            portal.anim.animation:draw(
+                portal.anim.portal_sheet,
+                portal.x, portal.y, 0, 
+                sX, sY,
+                portal.portal_FrameWidth / 2, portal.portal_FrameHeight / 2
+            )
+        end
     end
-
     -- Text to help player with keybindings
     Help_text()
 
