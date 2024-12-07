@@ -104,3 +104,6 @@ The love.draw() function is another core function in LOVE2D that draws informati
 - Menu_draw() handles the "Game Over" and "Game Complete" screens based on the game state. Also displaying the number of orbs collected, time alotted, and restart and quit keys
 
 - Hud_draw() outside of the cam:attach() boundary the hud is drawn showing the number of hearts the player has, a timer showing the time elapsed and a orb counter showing the number of orbs collected by the player
+
+#### conf.lua
+The config file of this program determines the configuration of the window used for the game
