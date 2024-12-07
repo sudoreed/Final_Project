@@ -46,6 +46,8 @@ _G.portal = {
     portal_FrameHeight = 152,
 }
 
+
+
 -- Declared variables used throughout program
 local maps = {"Maps/map.lua", "Maps/map2.lua", "Maps/map3.lua"}
 local currentMapIndex = 1
@@ -58,6 +60,10 @@ local gameState = "game"
 local gameComplete = false
 
 function love.load()
+-- Credit to Challacade for inspiration on the use of all the software modules/libraries used
+-- windfield, sti, anim8, HUMP/camera.lua
+-- https://www.youtube.com/@Challacade
+
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
     -- Loads font
@@ -69,6 +75,9 @@ function love.load()
     local wf = require 'Libraries/windfield'
     camera = require 'Libraries/camera'
     sti = require 'Libraries/sti'
+
+    -- Sound effects credit from itch.io: Cyrex studios(UI/Menu Soundpack), 
+    -- Jalastram(8-Bit Jumping Sounds), VOiD1 Gaming(HALFTONE Sound Effects)
 
     -- Loads sounds that are accessed from table
     sounds = {}
@@ -123,6 +132,13 @@ function setupPlayerCollider(wf)
 end
 
 function setupAnimations(anim8)
+    
+    -- Animations Credit 
+    -- Player: 9E0 Blue_witch https://9e0.itch.io/witches-pack
+    -- Orbs: Harley Modestowicz
+    -- Slimes: Diogo Vernier https://diogo-vernier.itch.io/pixel-art-slime
+    -- Portal: Harley Modestowicz
+
     player.animationCooldown = 1.0
     player.animationCooldownTimer = 0
 
@@ -610,70 +626,12 @@ end
 function love.draw()
     cam:attach()
 
-    -- Draw background and map layers
-    gameMap:drawLayer(gameMap.layers["BG_5"])
-    gameMap:drawLayer(gameMap.layers["BG_4"])
-    gameMap:drawLayer(gameMap.layers["BG_3"])
-    gameMap:drawLayer(gameMap.layers["BG_2"])
-    gameMap:drawLayer(gameMap.layers["BG_1"])
-    gameMap:drawLayer(gameMap.layers["Rocks"])
-    gameMap:drawLayer(gameMap.layers["Trees_2"])
-    gameMap:drawLayer(gameMap.layers["Trees"])
-    gameMap:drawLayer(gameMap.layers["Ground"])
-    
-    -- Draw the player sprite animation
-    if player.anim and player.anim.spritesheet then
-        player.anim.animation:draw(
-            player.anim.spritesheet,
-            player.x, player.y, 0, 
-            player.direction * scaleX, scaleY,
-            player.sprite_frame_width / 2, player.sprite_frame_height / 2
-        )
-    end
+    -- Draw background map layers
+    Background_draw()
 
-    -- Draw the orb animation at each collider's position
-    for _, orbData in ipairs(OrbColliders) do
-        local orbCollider = orbData.collider
-        if orbCollider and not orbCollider:isDestroyed() then
-            -- Get collider's position
-            local orbX, orbY = orbCollider:getPosition()
-            -- Draw orb animation
-            Hud.anim.animation:draw(
-                Hud.anim.orbsheet, orbX, orbY, 0, 0.37, 0.37, 
-                Hud.orbFrameWidth / 2, Hud.orbFrameHeight / 2)
-        end
-    end
+    -- Draws animations for player,orbs,enemies,portal
+    Animation_draw()
 
-    sX, sY = 2, 2
-    -- Draw slime animation at each ghosts position
-    for _, SlimeData in ipairs(SlimeColliders) do
-        local SlimeCollider = SlimeData.collider
-        local slimeDirection = SlimeData.direction
-        if slime.anim then
-            -- Get collider's position
-            slime.x, slime.y = SlimeCollider:getPosition()
-            -- Draw Ghost Animation
-            slime.anim.animation:draw(
-                slime.anim.slime_sheet,
-                slime.x, slime.y, nil,
-                slime.direction * sX, sY,
-                slime.slime_FrameWidth / 2, slime.slime_FrameHeight / 1.2)     
-        end
-    end
-
-    
-    -- Draw portal animations
-    if currentMapIndex == 3 then
-        if portal.anim and portal.anim.portal_sheet then
-            local sX, sY = 0.5, 0.5
-            portal.anim.animation:draw(
-                portal.anim.portal_sheet,
-                portal.x, portal.y, 0, 
-                sX, sY,
-                portal.portal_FrameWidth / 2, portal.portal_FrameHeight / 2
-            )
-        end
-    end
     -- Text to help player with keybindings
     Help_text()
 
@@ -684,6 +642,76 @@ function love.draw()
 
     -- Draws Hud/Orb_Counter/Hearts/Time
     Hud_draw()
+end
+
+function Background_draw()
+    -- Credit to the tileset for the tile/gameMap
+    -- GandalfHardcore: https://gandalfhardcore.itch.io/free-pixel-art-male-and-female-character
+
+    gameMap:drawLayer(gameMap.layers["BG_5"])
+    gameMap:drawLayer(gameMap.layers["BG_4"])
+    gameMap:drawLayer(gameMap.layers["BG_3"])
+    gameMap:drawLayer(gameMap.layers["BG_2"])
+    gameMap:drawLayer(gameMap.layers["BG_1"])
+    gameMap:drawLayer(gameMap.layers["Rocks"])
+    gameMap:drawLayer(gameMap.layers["Trees_2"])
+    gameMap:drawLayer(gameMap.layers["Trees"])
+    gameMap:drawLayer(gameMap.layers["Ground"])
+end
+
+function Animation_draw()
+        -- Draw the player sprite animation
+        if player.anim and player.anim.spritesheet then
+            player.anim.animation:draw(
+                player.anim.spritesheet,
+                player.x, player.y, 0, 
+                player.direction * scaleX, scaleY,
+                player.sprite_frame_width / 2, player.sprite_frame_height / 2
+            )
+        end
+    
+        -- Draw the orb animation at each collider's position
+        for _, orbData in ipairs(OrbColliders) do
+            local orbCollider = orbData.collider
+            if orbCollider and not orbCollider:isDestroyed() then
+                -- Get collider's position
+                local orbX, orbY = orbCollider:getPosition()
+                -- Draw orb animation
+                Hud.anim.animation:draw(
+                    Hud.anim.orbsheet, orbX, orbY, 0, 0.37, 0.37, 
+                    Hud.orbFrameWidth / 2, Hud.orbFrameHeight / 2)
+            end
+        end
+    
+        sX, sY = 2, 2
+        -- Draw slime animation at each ghosts position
+        for _, SlimeData in ipairs(SlimeColliders) do
+            local SlimeCollider = SlimeData.collider
+            local slimeDirection = SlimeData.direction
+            if slime.anim then
+                -- Get collider's position
+                slime.x, slime.y = SlimeCollider:getPosition()
+                -- Draw Ghost Animation
+                slime.anim.animation:draw(
+                    slime.anim.slime_sheet,
+                    slime.x, slime.y, nil,
+                    slime.direction * sX, sY,
+                    slime.slime_FrameWidth / 2, slime.slime_FrameHeight / 1.2)     
+            end
+        end
+        
+        -- Draw portal animations
+        if currentMapIndex == 3 then
+            if portal.anim and portal.anim.portal_sheet then
+                local sX, sY = 0.5, 0.5
+                portal.anim.animation:draw(
+                    portal.anim.portal_sheet,
+                    portal.x, portal.y, 0, 
+                    sX, sY,
+                    portal.portal_FrameWidth / 2, portal.portal_FrameHeight / 2
+                )
+            end
+        end
 end
 
 function Menu_draw()
