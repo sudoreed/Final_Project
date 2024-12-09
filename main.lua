@@ -1,10 +1,10 @@
 io.stdout:setvbuf("no")
 _G.love = require("love")
 
-local player = require('Source.Dictionarys.player')
-local Hud = require('Source.Dictionarys.hud')
-local Slime = require('Source.Dictionarys.slime')
-local portal = require('Source.Dictionarys.portal')
+local player = require('Source.Dictionaries.player')
+local Hud = require('Source.Dictionaries.hud')
+local Slime = require('Source.Dictionaries.slime')
+local portal = require('Source.Dictionaries.portal')
 
 local playerAnimations = require 'Source.Load.Animations.player_animations'
 local orbAnimations = require 'Source.Load.Animations.orb_animations'
