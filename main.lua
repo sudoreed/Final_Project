@@ -1,52 +1,29 @@
 io.stdout:setvbuf("no")
 _G.love = require("love")
 
-_G.player = {
-    x = 100,
-    y = 500,
-    speed = 5,
-    direction = 1,
-    dead = false,
-    isGrounded = true,
-    sheet_idle = 'Props/Blue_witch/idle.png',
-    sheet_run = 'Props/Blue_witch/run.png',
-    sheet_take_damage = 'Props/Blue_witch/take_damage.png',
-    animations = {},
-    sprite_frame_width = 32,
-    sprite_frame_height = 48,
-    sprite_death_height = 40
-}
+local player = require('Source.Dictionarys.player')
+local Hud = require('Source.Dictionarys.hud')
+local Slime = require('Source.Dictionarys.slime')
+local portal = require('Source.Dictionarys.portal')
 
-_G.Hud = {
-    health = 'Props/heart_bordered.png', -- H:17 W:17 Total_W:85
-    healthWidth = 17,
-    healthHeight = 17,
-    healthX = 15,
-    healthY = 10,
-    health_count = 3,
-    orb_sheet = 'Props/Orb.png',
-    orb_animations = {},
-    orbFrameHeight = 100,
-    orbFrameWidth = 58,
-    orb_count = 0
-}
+local playerAnimations = require 'Source.Load.Animations.player_animations'
+local orbAnimations = require 'Source.Load.Animations.orb_animations'
+local slimeAnimations = require 'Source.Load.Animations.slime_animations'
+local portalAnimations = require 'Source.Load.Animations.portal_animations'
 
-_G.slime = {
-    slime_sheet = 'Props/slime.png',
-    direction = 1,
-    slime_animations = {},
-    slime_FrameWidth = 16,
-    slime_FrameHeight = 32,
-}
+local updateCameraPosition = require 'Source.Update.camera_update'
+local updateSlimeColliders = require 'Source.Update.update_slime_colliders'
+local updateOrbColliders = require 'Source.Update.update_orb_colliders'
+local updateGroundedState = require 'Source.Update.grounded_state_update'
+local updatePlayerColliders = require 'Source.Update.update_player_collider'
+local animationsUpdate = require 'Source.Update.animations_update'
+local handlePlayerAnim = require('Source.Update.handle_player_anim')
 
-_G.portal = {
-    portal_sheet = {"Props/portal.png"},
-    portal_animations = {},
-    portal_FrameWidth = 122,
-    portal_FrameHeight = 152,
-}
-
-
+local Help_text = require 'Source.Draw.help_text'
+local Background_draw = require 'Source.Draw.background_draw'
+local Animation_draw = require 'Source.Draw.animations_draw'
+local Hud_draw = require 'Source.Draw.hud_draw'
+local Menu_draw = require 'Source.Draw.menu_draw'
 
 -- Declared variables used throughout program
 local maps = {"Maps/map.lua", "Maps/map2.lua", "Maps/map3.lua"}
@@ -76,6 +53,11 @@ function love.load()
     camera = require 'Libraries/camera'
     sti = require 'Libraries/sti'
 
+    playerAnimations.setupPlayerAnimations(anim8, player)
+    orbAnimations.setupOrbAnimations(anim8, Hud)
+    slimeAnimations.setupSlimeAnimations(anim8, Slime)
+    portalAnimations.setupPortalAnimations(anim8, portal)
+
     -- Sound effects credit from itch.io: Cyrex studios(UI/Menu Soundpack), 
     -- Jalastram(8-Bit Jumping Sounds), VOiD1 Gaming(HALFTONE Sound Effects)
 
@@ -93,7 +75,6 @@ function love.load()
     setupWorld(wf)
     setupHUD()
     setupPlayerCollider(wf)
-    setupAnimations(anim8)
     setupMap()
     setupCamera()
 
@@ -129,100 +110,6 @@ function setupPlayerCollider(wf)
     player.collider:setFixedRotation(true)
     player.collider:setLinearDamping(5)
     player.collider:setCollisionClass('Player')
-end
-
-function setupAnimations(anim8)
-    
-    -- Animations Credit 
-    -- Player: 9E0 Blue_witch https://9e0.itch.io/witches-pack
-    -- Orbs: Harley Modestowicz
-    -- Slimes: Diogo Vernier https://diogo-vernier.itch.io/pixel-art-slime
-    -- Portal: Harley Modestowicz
-
-    player.animationCooldown = 1.0
-    player.animationCooldownTimer = 0
-
-    -- Player animations
-    player.sheet_idle = love.graphics.newImage(player.sheet_idle)
-    player.sheet_run = love.graphics.newImage(player.sheet_run)
-    player.sheet_take_damage = love.graphics.newImage(player.sheet_take_damage)
-
-    player.idle_grid = anim8.newGrid(
-        player.sprite_frame_width,
-        player.sprite_frame_height,
-        player.sheet_idle:getWidth(),
-        player.sheet_idle:getHeight()
-    )
-
-    player.run_grid = anim8.newGrid(
-        player.sprite_frame_width,
-        player.sprite_frame_height,
-        player.sheet_run:getWidth(),
-        player.sheet_run:getHeight()
-    )
-
-    player.take_damage_grid = anim8.newGrid(
-        player.sprite_frame_width,
-        player.sprite_frame_height,
-        player.sheet_take_damage:getWidth(),
-        player.sheet_take_damage:getHeight()
-    )
-
-    player.animations.idle = {
-        animation = anim8.newAnimation(player.idle_grid(1, '1-6'), 0.2),
-        spritesheet = player.sheet_idle
-    }
-    player.animations.run = {
-        animation = anim8.newAnimation(player.run_grid(1, '1-8'), 0.2),
-        spritesheet = player.sheet_run
-    }
-    -- Default animation
-    player.anim = player.animations.idle
-
-    -- Orb animations
-    Hud.orb_sheet = love.graphics.newImage(Hud.orb_sheet)
-    Hud.grid = anim8.newGrid(
-        Hud.orbFrameWidth,
-        Hud.orbFrameHeight,
-        Hud.orb_sheet:getWidth(),
-        Hud.orb_sheet:getHeight()
-    )
-    Hud.orb_animations.orb = {
-        animation = anim8.newAnimation(Hud.grid('1-4', 1), 0.2),
-        orbsheet = Hud.orb_sheet
-    }
-    -- Default animation
-    Hud.anim = Hud.orb_animations.orb
-
-    -- Slime animations
-    slime.slime_sheet = love.graphics.newImage(slime.slime_sheet)
-    slime.grid = anim8.newGrid(
-        slime.slime_FrameWidth,
-        slime.slime_FrameHeight,
-        slime.slime_sheet:getWidth(),
-        slime.slime_sheet:getHeight()
-    )
-    slime.slime_animations.slime = {
-        animation = anim8.newAnimation(slime.grid('1-7', 1), 0.3),
-        slime_sheet = slime.slime_sheet
-    }
-    -- Default animation
-    slime.anim = slime.slime_animations.slime
-
-    -- Portal animation
-    portal.portal_sheet = love.graphics.newImage(portal.portal_sheet)
-    portal.grid = anim8.newGrid(
-        portal.portal_FrameWidth,
-        portal.portal_FrameHeight,
-        portal.portal_sheet:getWidth(),
-        portal.portal_sheet:getHeight()
-    )
-    portal.portal_animations.portal = {
-        animation = anim8.newAnimation(portal.grid('1-4', 1), 0.3),
-        portal_sheet = portal.portal_sheet
-    }
-    -- Default animation
-    portal.anim = portal.portal_animations.portal
 end
 
 -- Tables to hold current level's colliders
@@ -352,29 +239,25 @@ function love.update(dt) -- dt = delta time (time to complete frame)
     local isMoving = false
 
     -- Handle player movement
-    handlePlayerAnim()
+    handlePlayerAnim(player)
     
     -- Update grounded state
-    updateGroundedState()
+    updateGroundedState(player)
     jumpCooldown = math.max(0, jumpCooldown - dt)
 
     -- Update animations
-    animationsUpdate(dt)
+    animationsUpdate(dt, portal, Slime, player, Hud)
 
-    -- Quit game once reach portal layer
-    portalUpdate()
-
-    -- Menu update (death/game over)
     menuUpdate()
 
     -- Update player physics
-    updatePlayerColliders()
+    updatePlayerColliders(player, gameState, Hud, sounds)
 
     -- Update Ghost collider logic
-    updateSlimeColliders()
+    updateSlimeColliders(SlimeColliders)
 
     -- Update orb counter and collider logic
-    updateOrbColliders()
+    updateOrbColliders(OrbColliders, Hud, sounds)
 
     -- Update physics world
     world:update(dt)
@@ -382,8 +265,8 @@ function love.update(dt) -- dt = delta time (time to complete frame)
     player.y = player.collider:getY()
 
     -- Update camera position
-    updateCameraPosition()
-
+    updateCameraPosition(cam, player, cameraBounds)
+    
     -- Constantly checking end of level
     checkLevelEndCollision()
 
@@ -392,28 +275,12 @@ function love.update(dt) -- dt = delta time (time to complete frame)
         -- Regular game timer update
         elapsedTime = elapsedTime + dt
     end
+
+    -- Quit game once reach portal layer
+    endUpdate()
 end
 
-function animationsUpdate(dt)
-    -- player animations
-    if player.anim then
-        player.anim.animation:update(dt)
-    end
-    -- hud animations
-    if Hud.anim then
-        Hud.anim.animation:update(dt)
-    end
-    -- enemy animations
-    if slime.anim and slime.anim.animation then
-        slime.anim.animation:update(dt)
-    end
-    -- portal animations
-    if portal.anim and portal.anim.animation then
-        portal.anim.animation:update(dt)
-    end
-end
-
-function portalUpdate()
+function endUpdate()
     if player.collider:enter('Portal') then
         Hud.health_count = 0
         gameComplete = true
@@ -421,34 +288,50 @@ function portalUpdate()
     end
 end
 
-local sound = false
+local soundPlayed = false
 
 function menuUpdate()
     if Hud.health_count == 0 then
-        if gameComplete == false then
-            -- Playing sound once
-            if not sound then
-                sounds.loose:play()
-                sound = true
-            end
+        -- Debugging health count
+        print("Hud.health_count is 0. Teleporting player...")
+
+        -- Ensure collider exists and is dynamic before moving
+        if player.collider then
+            player.collider:setType('static')  -- Ensure collider can move
+            player.collider:setPosition(600, 300)
+            print("Player teleported to menu position.")
+        else
+            print("Error: Player collider is nil!")
         end
-        -- Moving player/camera to position of "menu"
-        gameState = "menu"
-        player.collider:setPosition(600, 300)
+
+        -- Set player to static to prevent further movement
         player.collider:setType('static')
-        -- Quit key
+
+        -- Play sound if not already played
+        if not soundPlayed then
+            if not gameComplete then
+                sounds.loose:play()
+            end
+            soundPlayed = true
+        end
+
+        -- Update game state to menu
+        gameState = "menu"
+        print("Game state set to menu.")
+
+        -- Handle user inputs
         if love.keyboard.isDown('escape') then
             love.event.quit()
-        end
-        -- Reset program key
-        if love.keyboard.isDown('r') then
+        elseif love.keyboard.isDown('r') then
             resetGame()
-            sound = false
+            soundPlayed = false
         end
     else
-        sound = false
+        soundPlayed = false
     end
 end
+
+local sound = false
 
 function resetGame()
     -- Reset player attributes
@@ -492,110 +375,6 @@ function resetGame()
     gameComplete = false
 end
 
-function handlePlayerAnim(dt)
-    -- Determines player animation based
-        -- on key movement
-    if player.dead == false then
-        if love.keyboard.isDown('a') then
-            player.anim = player.animations.run
-        elseif love.keyboard.isDown('d') then
-            player.anim = player.animations.run
-        else
-            player.anim = player.animations.idle
-        end
-    end
-end
-
-function updateSlimeColliders()
-    for i, SlimeData in ipairs(SlimeColliders) do
-        local SlimeCollider = SlimeData.collider
-        local Direction = SlimeData.direction
-        local Neg_Speed = -120
-        local Pos_Speed = 120
-        local px, py = SlimeCollider:getLinearVelocity()
-
-        -- Apply force based on current direction and velocity
-        if Direction == 1 and px > Neg_Speed then
-            SlimeCollider:applyForce(-4000, 0)
-        elseif Direction == 2 and px < Pos_Speed then
-            SlimeCollider:applyForce(4000, 0)
-        end
-
-        -- Check if SlimeCollider is inside the bounds
-        if SlimeCollider:enter('Slime_Bounds') then 
-            if Direction == 1 then
-                SlimeData.direction = 2  -- Change direction to right
-                slime.direction = 1
-            elseif Direction == 2 then
-                SlimeData.direction = 1  -- Change direction to left
-                slime.direction = -1
-            end
-        end
-    end
-end
-
-function updateOrbColliders()
-    for i = #OrbColliders, 1, -1 do
-        local orbData = OrbColliders[i]
-        local orbCollider = orbData.collider
-
-        -- Checks if player collides with orb
-        if orbCollider:enter('Player') then
-            orbCollider:destroy()
-            sounds.orb:play()
-            Hud.orb_count = Hud.orb_count + 1
-        end
-    end
-end
-
-function updateGroundedState()
-    -- Boolean value for grounded
-    if player.collider:enter('Ground') then
-        player.isGrounded = true
-    elseif player.collider:exit('Ground') then
-        player.isGrounded = false
-    elseif player.collider:stay('Ground') then
-        player.isGrounded = true
-    end
-end
-
-function updatePlayerColliders()
-    local px, py = player.collider:getLinearVelocity()
-    if gameState == "game" then    
-        if player.dead == false then
-            -- Updating player/collider movement
-            if love.keyboard.isDown('a') and px > -200 then -- Top speed parameter
-                player.x = player.x - player.speed
-                player.direction = -1
-                player.collider:applyForce(-4000, 0) -- Applied Force parameter
-            elseif love.keyboard.isDown('d') and px < 200 then
-                player.x = player.x + player.speed
-                player.direction = 1
-                player.collider:applyForce(4000, 0)
-            end
-        end
-        -- Tracking interaction of player and enemies
-        if player.collider:enter('Slimes') then
-            Hud.health_count = Hud.health_count - 1
-            if Hud.health_count > 0 then
-               sounds.damage:play() 
-            end
-        end
-    end
-end
-
-function updateCameraPosition()
-    cam:lookAt(player.x, player.y)
-    
-    local screenWidth, screenHeight = love.graphics.getWidth(), love.graphics.getHeight()
-    if cameraBounds then
-        local halfScreenWidth = screenWidth / 4
-        local halfScreenHeight = screenHeight / 3
-        cam.x = math.max(cameraBounds.minX + halfScreenWidth, math.min(cam.x, cameraBounds.maxX - halfScreenWidth))
-        cam.y = math.max(cameraBounds.minY + halfScreenHeight, math.min(cam.y, cameraBounds.maxY - halfScreenHeight))
-    end
-end
-
 function checkLevelEndCollision()
     -- Check for collision with Level_End object layer
     if player.collider:enter('LevelEnd') then
@@ -619,7 +398,7 @@ function checkLevelEndCollision()
         jumpCooldown = 0.1
         player.collider:setLinearVelocity(0,0)
         world:update(0)
-        updateGroundedState()
+        
     end
 end
 
@@ -627,178 +406,21 @@ function love.draw()
     cam:attach()
 
     -- Draw background map layers
-    Background_draw()
+    Background_draw(gameMap)
 
     -- Draws animations for player,orbs,enemies,portal
-    Animation_draw()
+    Animation_draw(player, OrbColliders, Hud, SlimeColliders, portal, currentMapIndex, scaleX, scaleY, Slime)
 
     -- Text to help player with keybindings
-    Help_text()
+    Help_text(currentMapIndex)
 
     -- Draws gameOver and gameComplete screens
-    Menu_draw()
+    Menu_draw(Hud, gameComplete, gameState)
 
     cam:detach()
 
     -- Draws Hud/Orb_Counter/Hearts/Time
-    Hud_draw()
-end
-
-function Background_draw()
-    -- Credit to the tileset for the tile/gameMap
-    -- GandalfHardcore: https://gandalfhardcore.itch.io/free-pixel-art-male-and-female-character
-
-    gameMap:drawLayer(gameMap.layers["BG_5"])
-    gameMap:drawLayer(gameMap.layers["BG_4"])
-    gameMap:drawLayer(gameMap.layers["BG_3"])
-    gameMap:drawLayer(gameMap.layers["BG_2"])
-    gameMap:drawLayer(gameMap.layers["BG_1"])
-    gameMap:drawLayer(gameMap.layers["Rocks"])
-    gameMap:drawLayer(gameMap.layers["Trees_2"])
-    gameMap:drawLayer(gameMap.layers["Trees"])
-    gameMap:drawLayer(gameMap.layers["Ground"])
-end
-
-function Animation_draw()
-        -- Draw the player sprite animation
-        if player.anim and player.anim.spritesheet then
-            player.anim.animation:draw(
-                player.anim.spritesheet,
-                player.x, player.y, 0, 
-                player.direction * scaleX, scaleY,
-                player.sprite_frame_width / 2, player.sprite_frame_height / 2
-            )
-        end
-    
-        -- Draw the orb animation at each collider's position
-        for _, orbData in ipairs(OrbColliders) do
-            local orbCollider = orbData.collider
-            if orbCollider and not orbCollider:isDestroyed() then
-                -- Get collider's position
-                local orbX, orbY = orbCollider:getPosition()
-                -- Draw orb animation
-                Hud.anim.animation:draw(
-                    Hud.anim.orbsheet, orbX, orbY, 0, 0.37, 0.37, 
-                    Hud.orbFrameWidth / 2, Hud.orbFrameHeight / 2)
-            end
-        end
-    
-        sX, sY = 2, 2
-        -- Draw slime animation at each ghosts position
-        for _, SlimeData in ipairs(SlimeColliders) do
-            local SlimeCollider = SlimeData.collider
-            local slimeDirection = SlimeData.direction
-            if slime.anim then
-                -- Get collider's position
-                slime.x, slime.y = SlimeCollider:getPosition()
-                -- Draw Ghost Animation
-                slime.anim.animation:draw(
-                    slime.anim.slime_sheet,
-                    slime.x, slime.y, nil,
-                    slime.direction * sX, sY,
-                    slime.slime_FrameWidth / 2, slime.slime_FrameHeight / 1.2)     
-            end
-        end
-        
-        -- Draw portal animations
-        if currentMapIndex == 3 then
-            if portal.anim and portal.anim.portal_sheet then
-                local sX, sY = 0.5, 0.5
-                portal.anim.animation:draw(
-                    portal.anim.portal_sheet,
-                    portal.x, portal.y, 0, 
-                    sX, sY,
-                    portal.portal_FrameWidth / 2, portal.portal_FrameHeight / 2
-                )
-            end
-        end
-end
-
-function Menu_draw()
-    if Hud.health_count == 0 then
-        -- Draw the menu only when the game is over
-        local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
-
-        -- Draw the black rectangle centered
-        love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.rectangle('fill', 0, 0, windowWidth, windowHeight)
-        -- Reset color for text
-        love.graphics.setColor(1, 1, 1, 1)
-        -- Draw the text centered
-        love.graphics.print("Press \"Escape\" to Quit", 670, 300, 0, 0.5, 0.5)
-        love.graphics.print("Press \"R\" to Restart", 400, 300, 0, 0.5, 0.5)
-        if gameComplete == true then
-            love.graphics.print("To Be Continued...", 480, 200, 0, 1, 1)
-        else
-            love.graphics.print("Game Over", 460, 200, 0, 2, 2)
-        end
-    end
-end
-
-
-function Help_text()
-    -- Draws text to help user
-    if currentMapIndex == 1 then
-        love.graphics.print("PRESS \"A\" and \"D\" TO MOVE LEFT AND RIGHT", 75, 350, 0, 0.5, 0.5)
-        love.graphics.print("YOU JUMP WITH \"SPACE\"", 125, 370, 0, 0.5, 0.5)
-        love.graphics.print("COLLECT AS MANY ORBS AS YOU CAN!!", 635, 300, 0, 0.55, 0.55)
-    end
-end
-
-function Hud_draw()
-    if gameState == "game" then
-        -- Draw the health bar (hearts)
-        local heartWidth, heartHeight = heartImage:getWidth() / 5, heartImage:getHeight()
-        local scale = 3  -- Scale the hearts to make them bigger
-        local x = Hud.healthX
-        local y = Hud.healthY
-        -- Keeping num of hearts in range of 0-3
-        if Hud.health_count > 3 then
-            Hud.health_count = 3
-        elseif Hud.health_count < 0 then
-            Hud.health_count = 0
-        end
-        -- Loop through the 3 hearts
-        for i = 1, 3 do
-            -- Determine if the current heart should be full or empty based on health count
-            local heartQuad
-            if i <= Hud.health_count then
-                -- Full heart (left side of the PNG)
-                heartQuad = love.graphics.newQuad(0, 0, heartWidth, heartHeight, heartImage:getDimensions())
-            else
-                -- Empty heart (right side of the PNG)
-                heartQuad = love.graphics.newQuad(heartWidth * 4, 0, heartWidth, heartHeight, heartImage:getDimensions())
-            end
-            -- Draw the heart at the calculated position
-            love.graphics.draw(heartImage, heartQuad, x + (i - 1) * (heartWidth * scale + 5), y, 0, scale, scale)
-        end
-
-        -- Orb Counter Image
-        love.graphics.draw(Hud.orb_sheet, orbQuad, 1060, 0, nil, 3.2)
-
-        --Format the time as MM:SS
-        local minutes = math.floor(elapsedTime / 60)
-        local seconds = math.floor(elapsedTime % 60)
-        local formattedTime = string.format("%02d:%02d", minutes, seconds)
-        
-        -- Draw the timer
-        love.graphics.setColor(0.5,1,0,1) -- Color for timer
-        love.graphics.print("Time: " .. formattedTime, 500, 10, 0, 1.3, 1.3)
-        -- Draw orb counter
-        love.graphics.setColor(0,0.8,0.9) -- Color for orb counter
-        love.graphics.print("x" .. Hud.orb_count, 1105, 15, 0, 1.4, 1.4)
-        love.graphics.setColor(1,1,1) -- Reset Color
-
-        if Hud.health_count == 0 then
-            player.dead = true  
-        end
-    end
-    if gameState == "menu" then
-        -- Uses the Hud to draw hud based information in the menu draw screen
-        love.graphics.draw(Hud.orb_sheet, orbQuad, 820, 235, nil, 3.2)
-        love.graphics.print("X" .. Hud.orb_count, 870, 250, 0, 1.4, 1.4)
-        love.graphics.print("Time Elapsed... " .. math.floor(elapsedTime), 250, 260)
-    end
+    Hud_draw(Hud, gameState, heartImage, player, elapsedTime)
 end
 
 function love.keypressed(key)
